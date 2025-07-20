@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background: black; /* Prevent white flash */
+}
+
+.webgl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+}
+
+.scroll-container {
+  height: 200vh;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+  background: transparent;
+}
+
+
+ 

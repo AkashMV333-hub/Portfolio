@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
+import planetColorImg from './assets/Terrain005_1k-JPG/Terrain005_1K_Color.jpg';
+import planetDetailImg from './assets/Terrain005_1k-JPG/Terrain005_1K_Details.jpg';
+import planetSnowfallImg from './assets/Terrain005_1k-JPG/Terrain005_1K_Snowfall.jpg';
 
 const App = () => {
   const [currentSection, setCurrentSection] = useState(0);
@@ -52,18 +55,24 @@ const App = () => {
 
     scene.add(mesh1, mesh2, mesh3);
 
-    // Planet-like ground
-    const groundGeometry = new THREE.CircleGeometry(20, 64);
-    const groundMaterial = new THREE.MeshStandardMaterial({
-      color: 0x8B4513,
-      side: THREE.DoubleSide,
-    });
-    // Remove texture and rely on material color only
-    groundMaterial.map = null;
+    // Planet-like ground using a plane
+    const textureLoader = new THREE.TextureLoader();
+    const colorTexture = textureLoader.load(planetColorImg);
+    const detailTexture = textureLoader.load(planetDetailImg);
+    // Optionally, you can use the snowfall texture as a roughness or additional detail map
+    // const snowfallTexture = textureLoader.load(planetSnowfallImg);
 
+    const groundGeometry = new THREE.PlaneGeometry(100, 100, 64, 64); // Large plane
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      map: colorTexture,
+      bumpMap: detailTexture,
+      bumpScale: 1.5, // Adjust for more or less surface relief
+      // roughnessMap: snowfallTexture, // Uncomment if you want to use the snowfall as roughness
+      // roughness: 1.0, // Adjust as needed
+    });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -1;
+    ground.rotation.x = -Math.PI / 2; // Make it horizontal
+    ground.position.y = -1; // Adjust as needed
     scene.add(ground);
 
     mesh2Ref.current = mesh2;
@@ -72,9 +81,7 @@ const App = () => {
     // STEP 6: Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
-
-    // Fog for depth effect
-    scene.fog = new THREE.Fog(0x000000, 5, 15);
+ 
 
     // Directional light (like a sun)
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -83,10 +90,20 @@ const App = () => {
 
 
     // STEP 7: Particles
-    const particlesCount = 200;
-    const positions = new Float32Array(particlesCount * 3); // x, y, z for each
-    for (let i = 0; i < particlesCount * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * 10; // Random range -5 to 5
+    const particlesCount = 1500;
+    const positions = new Float32Array(particlesCount * 3);
+    const minRadius = 30; // Minimum distance from the center (planet/user)
+    const maxRadius = 40; // Maximum distance
+
+    for (let i = 0; i < particlesCount; i++) {
+      // Random spherical coordinates
+      const theta = Math.random() * 2 * Math.PI;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const radius = minRadius + Math.random() * (maxRadius - minRadius);
+
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta); // x
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta); // y
+      positions[i * 3 + 2] = radius * Math.cos(phi); // z
     }
     const particlesGeometry = new THREE.BufferGeometry();
     particlesGeometry.setAttribute(

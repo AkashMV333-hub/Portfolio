@@ -60,15 +60,15 @@ const App = () => {
     const colorTexture = textureLoader.load(planetColorImg);
     const detailTexture = textureLoader.load(planetDetailImg);
     // Optionally, you can use the snowfall texture as a roughness or additional detail map
-    // const snowfallTexture = textureLoader.load(planetSnowfallImg);
+    const snowfallTexture = textureLoader.load(planetSnowfallImg);
 
     const groundGeometry = new THREE.PlaneGeometry(100, 100, 64, 64); // Large plane
     const groundMaterial = new THREE.MeshStandardMaterial({
       map: colorTexture,
       bumpMap: detailTexture,
       bumpScale: 1.5, // Adjust for more or less surface relief
-      // roughnessMap: snowfallTexture, // Uncomment if you want to use the snowfall as roughness
-      // roughness: 1.0, // Adjust as needed
+      roughnessMap: snowfallTexture, // Uncomment if you want to use the snowfall as roughness
+      roughness: 1.0, // Adjust as needed
     });
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = -Math.PI / 2; // Make it horizontal
